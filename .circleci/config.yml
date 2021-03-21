@@ -8,4 +8,4 @@ jobs:
       - checkout
       - run: mvn clean install org.pitest:pitest-maven:mutationCoverage
       - store_test_results:
-          path: pit-reports
+          path: target/pit-reports
