@@ -7,3 +7,5 @@ jobs:
     steps:
       - checkout
       - run: mvn clean install org.pitest:pitest-maven:mutationCoverage
+      - store_test_results:
+          path: test-results
