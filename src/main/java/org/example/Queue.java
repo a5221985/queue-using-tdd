@@ -4,8 +4,8 @@ public class Queue {
     private static final int INITIAL_CAPACITY = 10;
     private int[] elements = new int[INITIAL_CAPACITY];
     private int size = 0;
-    private int first = 0;
-    private int last = -1;
+    private int headIndex = 0;
+    private int tailIndex = -1;
     private int capacity = INITIAL_CAPACITY;
 
     public boolean isEmpty() {
@@ -14,23 +14,36 @@ public class Queue {
 
     public void enqueue(int element) {
         expandQueueIfRequired();
-        last = (++last) % capacity;
-        elements[last] = element;
-        size++;
+        appendElement(element);
     }
 
     public int dequeue() {
-        if (isEmpty())
-            throw new UnderflowException();
-        int current = first;
-        first = (++first) % capacity;
-        size--;
+        verifyThatQueueIsNotEmpty();
+        int currentElement = removeElement();
         resetQueueIfRequired();
-        return elements[current];
+        return currentElement;
     }
 
     public int size() {
         return size;
+    }
+
+    private void appendElement(int element) {
+        tailIndex = (++tailIndex) % capacity;
+        elements[tailIndex] = element;
+        size++;
+    }
+
+    private int removeElement() {
+        int currentElement = elements[headIndex];
+        headIndex = (++headIndex) % capacity;
+        size--;
+        return currentElement;
+    }
+
+    private void verifyThatQueueIsNotEmpty() {
+        if (isEmpty())
+            throw new UnderflowException();
     }
 
     private void resetQueueIfRequired() {
@@ -39,8 +52,8 @@ public class Queue {
     }
 
     private void resetQueue() {
-        first = 0;
-        last = -1;
+        headIndex = 0;
+        tailIndex = -1;
     }
 
     private void expandQueueIfRequired() {
@@ -50,14 +63,15 @@ public class Queue {
 
     private void expandQueue() {
         capacity *= 2;
-        elements = increaseCapacity(elements, capacity, first, last);
-        first = 0;
-        last = size() - 1;
+        elements = increaseCapacity(elements, capacity, headIndex, tailIndex);
+        headIndex = 0;
+        tailIndex = size() - 1;
     }
 
     private int[] increaseCapacity(final int[] elements, int newCapacity, int sourceStartIndex, int sourceEndIndex) {
         int[] newElements = new int[newCapacity];
-        for (int i = sourceStartIndex, k = 0; i <= sourceEndIndex; i++)
+        int k = 0;
+        for (int i = sourceStartIndex; i <= sourceEndIndex; i++)
             newElements[k++] = elements[i];
         return newElements;
     }
