@@ -1,4 +1,4 @@
-version: 2.0
+version: 2
 
 jobs:
   build:
@@ -6,8 +6,17 @@ jobs:
       - image: circleci/openjdk:stretch
     steps:
       - checkout
+      - run:
+          name: Analyze on SonarCloud
+          command: mvn verify sonar:sonar
       - run: mvn clean install org.pitest:pitest-maven:mutationCoverage
       - store_test_results:
           path: target/surefire-reports
       - store_artifacts:
           path: target/pit-reports
+
+workflows:
+  main:
+    jobs:
+      - build:
+          context: SonarCloud
